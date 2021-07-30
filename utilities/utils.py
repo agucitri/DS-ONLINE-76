@@ -1,5 +1,13 @@
 import pandas as pd
 from scipy.stats import shapiro, normaltest, anderson
+from statsmodels.stats.outliers_influence import variance_inflation_factor
+
+
+def calculate_vif(data: pd.DataFrame):
+    vif = pd.DataFrame()
+    vif["feature"] = data.columns
+    vif["VIF"] = [variance_inflation_factor(data.values, i) for i in range(len(data.columns))]
+    return vif
 
 
 def normal_test(data: pd.DataFrame, column: str, alpha: float = 0.05, method: str = "shapiro"):
