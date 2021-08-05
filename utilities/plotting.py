@@ -2,6 +2,7 @@ import numpy as np
 import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
+import plotly.graph_objs as go
 
 
 def barplot(dataframe: pd.DataFrame, column: str, **kwargs):
@@ -56,3 +57,25 @@ def heat_map(dataframe: pd.DataFrame, **kwargs):
     :return:
     """
     return sns.heatmap(dataframe, annot=True, fmt=".1g", linecolor="w", linewidths=3, **kwargs)
+
+
+def radar_chart(df: pd.DataFrame, columns: list, label: str, title: str):
+    """
+    Radar chart filtering by the categories of the target variable
+    :param title: title
+    :param df: DataFrame
+    :param columns: columns of interest
+    :param label: target variable
+    :return:
+    """
+    categories = sorted(df[label].unique().tolist())
+    table = np.round(df.groupby(by=label, as_index=True)[columns].mean(), decimals=2)
+    figure = go.Figure()
+    for categorie in categories:
+        figure.add_trace(go.Scatterpolar(r=table.loc[categorie].tolist(),
+                                         theta=columns,
+                                         fill='toself',
+                                         name=categorie))
+    figure.update_layout(polar=dict(radialaxis=dict(visible=True, range=[0, 1])),
+                         showlegend=True, title=title)
+    return figure.show()
